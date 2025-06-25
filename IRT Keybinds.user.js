@@ -20,6 +20,7 @@ import _ from 'lodash';
     const radioVDOM = await IRF.vdom.radio;
     const radioBody = await IRF.dom.radio;
     const wheelBody = await IRF.dom.wheel;
+    const containerBody = await IRF.dom.container;
 
     document.addEventListener('keydown', handler);
 
@@ -70,7 +71,7 @@ import _ from 'lodash';
             '-': 10,
             '=': 11
         };
-        const options = document.getElementsByClassName('option');
+        const options = containerBody.getElementsByClassName('option');
         const optionsSorted = _.sortBy(options,[function (option) { return getRotation(option);}])
         if (optionSelect.hasOwnProperty(e.key)){
             if (optionsSorted[optionSelect[e.key]]) {
