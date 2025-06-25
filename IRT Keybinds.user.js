@@ -24,12 +24,6 @@ import _ from 'lodash';
     document.addEventListener('keydown', handler);
 
     function handler(e) {
-        // if (e.code === 'KeyM') {
-        //     radioBody.querySelector('.power-button').click();
-        // }
-        // if (e.code === 'KeyS') {
-        //     radioBody.querySelector('.control-button').click();
-        // }
         switch (e.code) {
             case 'KeyM':
                 radioBody.querySelector('.power-button').click();
@@ -107,11 +101,11 @@ import _ from 'lodash';
         }
     }
 
-
     function getRotation(elem){
         if (elem.style.rotate) {
             const re = new RegExp('.*(?=deg)')
             return parseFloat(elem.style.rotate.match(re)[0]);
         }
+        return null;
     }
 })();
