@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.1
+// @version     0.1.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
