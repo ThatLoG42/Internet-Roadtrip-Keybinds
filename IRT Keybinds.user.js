@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.1.1
+// @version     0.1.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -21,6 +21,7 @@ import _ from 'lodash';
     const radioBody = await IRF.dom.radio;
     const wheelBody = await IRF.dom.wheel;
     const containerBody = await IRF.dom.container;
+    const mapBody = await IRF.dom.map;
 
     document.addEventListener('keydown', handler);
 
@@ -34,6 +35,8 @@ import _ from 'lodash';
                 break;
             case 'Space':
                 wheelBody.querySelector('.wheel-click-area').click();
+            case 'KeyE':
+                mapBody.querySelector('.expand-button').click();
             default:
                 break;
         }
