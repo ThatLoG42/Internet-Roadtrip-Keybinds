@@ -37,15 +37,10 @@ import _ from 'lodash';
                 wheelBody.querySelector('.wheel-click-area').click();
             case 'KeyE':
                 mapBody.querySelector('.expand-button').click();
-            default:
-                break;
-        }
-
-        switch (e.key) {
-            case '<':
+            case 'Comma':
                 volSetter(radioVDOM.data.volume - 5);
                 break;
-            case '>':
+            case 'Period':
                 volSetter(radioVDOM.data.volume + 5);
                 break;
             default:
