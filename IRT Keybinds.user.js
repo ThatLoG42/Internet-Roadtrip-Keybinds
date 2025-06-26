@@ -58,24 +58,24 @@ import _ from 'lodash';
 
     function chooseOption(e) {
         const optionSelect = {
-            '1': 0,
-            '2': 1,
-            '3': 2,
-            '4': 3,
-            '5': 4,
-            '6': 5,
-            '7': 6,
-            '8': 7,
-            '9': 8,
-            '10': 9,
-            '-': 10,
-            '=': 11
+            'Digit1': 0,
+            'Digit2': 1,
+            'Digit3': 2,
+            'Digit4': 3,
+            'Digit5': 4,
+            'Digit6': 5,
+            'Digit7': 6,
+            'Digit8': 7,
+            'Digit9': 8,
+            'Digit0': 9,
+            'Minus': 10,
+            'Equal': 11
         };
         const options = containerBody.getElementsByClassName('option');
         const optionsSorted = _.sortBy(options,[function (option) { return getRotation(option);}])
-        if (optionSelect.hasOwnProperty(e.key)){
-            if (optionsSorted[optionSelect[e.key]]) {
-                optionsSorted[optionSelect[e.key]].click();
+        if (optionSelect.hasOwnProperty(e.code)){
+            if (optionsSorted[optionSelect[e.code]]) {
+                optionsSorted[optionSelect[e.code]].click();
                 return;
             }
         }
