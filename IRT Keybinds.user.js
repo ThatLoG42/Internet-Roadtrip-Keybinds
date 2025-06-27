@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.2.0
+// @version     0.2.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -115,7 +115,7 @@ import _ from 'lodash';
     }
 
     function bandwagon() {
-        const curVotes = resultsVDOM.data.displayedVotes;
+        const curVotes = resultsVDOM.props.voteCounts;
         const popOption = parseInt(_.maxBy(Object.keys(curVotes), (o) => curVotes[o]));
         try {
             switch (popOption) {
