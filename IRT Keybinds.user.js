@@ -125,7 +125,7 @@ import _ from 'lodash';
                 case -1:
                     radioVDOM.methods.seek();
                 default:
-                    optionsVDOM.methods.vote(popOption)
+                    optionsVDOM.methods.vote(popOption);
                     break;
             }
             console.log(`Bandwagoned for option ${popOption}.`)
