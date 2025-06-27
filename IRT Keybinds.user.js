@@ -128,9 +128,9 @@ import _ from 'lodash';
                     optionsVDOM.methods.vote(popOption);
                     break;
             }
-            console.log(`Bandwagoned for option ${popOption}.`)
+            console.log(`Bandwagoned for option ${popOption}.`);
         } catch (error) {
-            console.log("Couldn't pick an option. WHY ARE YOU RELYING ON ME?????")
+            console.log("Couldn't pick an option. WHY ARE YOU RELYING ON ME?????");
         }
     }
 })();
