@@ -14,15 +14,15 @@ import * as IRF from 'internet-roadtrip-framework';
 import _ from 'lodash';
 
 (async () => {
-    if (!IRF.isInternetRoadtrip) {
-        return;
-    }
+    if (!IRF.isInternetRoadtrip) return;
+
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
     const containerBody = await IRF.dom.container;
     const mapVDOM = await IRF.vdom.map;
     const resultsVDOM = await IRF.vdom.results;
     const optionsVDOM = await IRF.vdom.options;
+
     document.addEventListener('keydown', handler);
 
     function handler(e) {
