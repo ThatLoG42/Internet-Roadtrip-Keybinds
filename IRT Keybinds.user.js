@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.1.3
+// @version     0.2.0
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -18,26 +18,26 @@ import _ from 'lodash';
         return;
     }
     const radioVDOM = await IRF.vdom.radio;
-    const radioBody = await IRF.dom.radio;
-    const wheelBody = await IRF.dom.wheel;
+    const wheelVDOM = await IRF.vdom.wheel;
     const containerBody = await IRF.dom.container;
-    const mapBody = await IRF.dom.map;
-
+    const mapVDOM = await IRF.vdom.map;
+    const resultsVDOM = await IRF.vdom.results;
+    const optionsVDOM = await IRF.vdom.options;
     document.addEventListener('keydown', handler);
 
     function handler(e) {
         switch (e.code) {
             case 'KeyR':
-                radioBody.querySelector('.power-button').click();
+                radioVDOM.methods.togglePower();
                 break;
             case 'KeyS':
-                radioBody.querySelector('.control-button').click();
+                radioVDOM.methods.seek();
                 break;
             case 'Space':
-                wheelBody.querySelector('.wheel-click-area').click();
+                wheelVDOM.methods.onHonkClick();
                 break;
             case 'KeyE':
-                mapBody.querySelector('.expand-button').click();
+                mapVDOM.methods.toggleExpand();
                 break;
             case 'Comma':
                 volSetter(radioVDOM.data.volume - 5);
@@ -45,6 +45,10 @@ import _ from 'lodash';
             case 'Period':
                 volSetter(radioVDOM.data.volume + 5);
                 break;
+            case 'Slash':
+                if (e.key === '?') {
+                    bandwagon();
+                }
             default:
                 chooseOption(e);
         }
@@ -108,5 +112,25 @@ import _ from 'lodash';
             return parseFloat(elem.style.rotate.match(re)[0]);
         }
         return null;
+    }
+
+    function bandwagon() {
+        const curVotes = resultsVDOM.data.displayedVotes;
+        const popOption = parseInt(_.maxBy(Object.keys(curVotes), (o) => curVotes[o]));
+        try {
+            switch (popOption) {
+                case -2:
+                    wheelVDOM.methods.onHonkClick();
+                    break;
+                case -1:
+                    radioVDOM.methods.seek();
+                default:
+                    optionsVDOM.methods.vote(popOption)
+                    break;
+            }
+            console.log(`Bandwagoned for option ${popOption}.`)
+        } catch (error) {
+            console.log("Couldn't pick an option. WHY ARE YOU RELYING ON ME?????")
+        }
     }
 })();
