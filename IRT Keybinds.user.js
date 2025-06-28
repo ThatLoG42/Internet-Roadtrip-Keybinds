@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.2.1.1
+// @version     0.2.1.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -20,7 +20,6 @@ import _ from 'lodash';
     const wheelVDOM = await IRF.vdom.wheel;
     const containerBody = await IRF.dom.container;
     const mapVDOM = await IRF.vdom.map;
-    const resultsVDOM = await IRF.vdom.results;
     const optionsVDOM = await IRF.vdom.options;
     const containerVDOM = await IRF.vdom.container;
 
