@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.2.1.2
+// @version     0.2.1.3
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -16,12 +16,12 @@ import _ from 'lodash';
 (async () => {
     if (!IRF.isInternetRoadtrip) return;
 
-    const radioVDOM = await IRF.vdom.radio;
-    const wheelVDOM = await IRF.vdom.wheel;
-    const containerBody = await IRF.dom.container;
+    const optionsBody = await IRF.dom.options;
+    const containerVDOM = await IRF.vdom.container;
     const mapVDOM = await IRF.vdom.map;
     const optionsVDOM = await IRF.vdom.options;
-    const containerVDOM = await IRF.vdom.container;
+    const radioVDOM = await IRF.vdom.radio;
+    const wheelVDOM = await IRF.vdom.wheel;
 
     document.addEventListener('keydown', handler);
 
@@ -75,7 +75,7 @@ import _ from 'lodash';
             'Minus': 10,
             'Equal': 11
         };
-        const options = containerBody.getElementsByClassName('option');
+        const options = optionsBody.getElementsByClassName('option');
         const optionsSorted = _.sortBy(options,[function (option) { return getRotation(option);}])
         if (optionSelect.hasOwnProperty(e.code)){
             if (optionsSorted[optionSelect[e.code]]) {
