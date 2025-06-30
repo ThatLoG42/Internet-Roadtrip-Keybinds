@@ -10,7 +10,7 @@
 // @require     https://cdn.jsdelivr.net/npm/internet-roadtrip-framework@0.4.1-beta
 // @require     https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js
 // ==/UserScript==
-import * as IRF from 'internet-roadtrip-framework';
+import IRF from 'internet-roadtrip-framework';
 import _ from 'lodash';
 
 (async () => {
