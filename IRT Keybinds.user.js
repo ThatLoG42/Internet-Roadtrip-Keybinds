@@ -86,7 +86,7 @@ import _ from 'lodash';
             'Equal': 11
         };
         const options = optionsBody.getElementsByClassName('option');
-        const optionsSorted = _.sortBy(options,[function (option) { return getRotation(option);}])
+        const optionsSorted = _.sortBy(options,function (option) { return getRotation(option); })
         if (optionSelect.hasOwnProperty(e.code)){
             if (optionsSorted[optionSelect[e.code]]) {
                 optionsSorted[optionSelect[e.code]].click();
