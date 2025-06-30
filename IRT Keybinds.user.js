@@ -50,12 +50,15 @@ import _ from 'lodash';
                 if (e.key === '?') {
                     bandwagon();
                 }
+                break;
             case 'KeyT':
                 chatVDOM.methods.toggleChat();
+                break;
             case 'Backquote':
                 if (e.key === '~') {
                     chatVDOM.methods.openDiscord();
                 }
+                break;
             default:
                 chooseOption(e);
         }
