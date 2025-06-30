@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.2.1.3
+// @version     0.2.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -17,6 +17,7 @@ import _ from 'lodash';
     if (!IRF.isInternetRoadtrip) return;
 
     const optionsBody = await IRF.dom.options;
+    const chatVDOM = await IRF.vdom.chat;
     const containerVDOM = await IRF.vdom.container;
     const mapVDOM = await IRF.vdom.map;
     const optionsVDOM = await IRF.vdom.options;
@@ -48,6 +49,12 @@ import _ from 'lodash';
             case 'Slash':
                 if (e.key === '?') {
                     bandwagon();
+                }
+            case 'KeyT':
+                chatVDOM.methods.toggleChat();
+            case 'Backquote':
+                if (e.key === '~') {
+                    chatVDOM.methods.openDiscord();
                 }
             default:
                 chooseOption(e);
