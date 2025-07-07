@@ -3,4 +3,17 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 0.5rem;
+
+    input[type=button] {
+        padding: 0.35rem 1rem;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        background: transparent;
+        color: rgb(255, 255, 255);
+        font-size: 0.9rem;
+        font-family: inherit;
+        transition: 0.2s;
+        white-space: nowrap;
+    }
 }

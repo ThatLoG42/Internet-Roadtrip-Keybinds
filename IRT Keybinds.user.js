@@ -156,6 +156,19 @@ import _ from 'lodash';
         align-items: center;
         justify-content: space-between;
         margin-bottom: 0.5rem;
+    
+        input[type=button] {
+            padding: 0.35rem 1rem;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
+            background: transparent;
+            color: rgb(255, 255, 255);
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
     }
     `
     tab.container.appendChild(tabStyle);
@@ -167,8 +180,7 @@ import _ from 'lodash';
     labelOne.textContent = 'hehee';
 
     const buttonOne = document.createElement('input')
-    buttonOne.type = 'checkbox';
-    buttonOne.className = IRF.ui.panel.styles.toggle;
+    buttonOne.type = 'button';
     
     tab.container.appendChild(testRow);
     testRow.appendChild(labelOne);
