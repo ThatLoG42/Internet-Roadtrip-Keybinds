@@ -148,4 +148,29 @@ import _ from 'lodash';
         tabName: 'Keybinds',
         className: 'keybinds-tab'
     });
+
+    const tabStyle = document.createElement('style');
+    tabStyle.textContent = `
+    .keybinds-tab .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    `
+    tab.container.appendChild(tabStyle);
+
+    const testRow = document.createElement('div');
+    testRow.classList.add('row');
+
+    const labelOne = document.createElement('label');
+    labelOne.textContent = 'hehee';
+
+    const buttonOne = document.createElement('input')
+    buttonOne.type = 'checkbox';
+    buttonOne.className = IRF.ui.panel.styles.toggle;
+    
+    tab.container.appendChild(tabStyle);
+    testRow.appendChild(labelOne);
+    testRow.appendChild(buttonOne);
 })();
