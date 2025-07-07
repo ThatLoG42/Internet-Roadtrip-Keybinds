@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.2.2
+// @version     0.2.2.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -143,4 +143,9 @@ import _ from 'lodash';
             console.log("Couldn't bandwagon.");
         }
     }
+
+    const tab = await IRF.ui.panel.createTabFor(GM.info, {
+        tabName: 'Keybinds',
+        className: 'keybinds-tab'
+    });
 })();
