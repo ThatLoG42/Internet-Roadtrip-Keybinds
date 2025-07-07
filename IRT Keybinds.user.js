@@ -170,7 +170,7 @@ import _ from 'lodash';
     buttonOne.type = 'checkbox';
     buttonOne.className = IRF.ui.panel.styles.toggle;
     
-    tab.container.appendChild(tabStyle);
+    tab.container.appendChild(testRow);
     testRow.appendChild(labelOne);
     testRow.appendChild(buttonOne);
 })();
