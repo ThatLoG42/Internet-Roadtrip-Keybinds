@@ -14,7 +14,7 @@ import _ from 'lodash';
 // @require     https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js
 // ==/UserScript==
 
-(async () => {  
+(async () => { 
     if (!IRF.isInternetRoadtrip) return;
 
     const optionsBody = await IRF.dom.options;
