@@ -17,3 +17,32 @@
         white-space: nowrap;
     }
 }
+
+#input-device {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    #the-unhider {
+        width: 30%;
+        height: 30vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        #input-element {
+            border-radius: 9999px;
+            opacity: 0;
+        }
+    }
+
+    #the-unhider:hover #input-element {
+        opacity: 1;
+    }
+}

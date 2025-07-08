@@ -1,19 +1,20 @@
+import IRF from 'internet-roadtrip-framework';
+import _ from 'lodash';
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.2.2.1
+// @version     0.3
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
+// @grant       GM_addStyle
 // @match       https://neal.fun/internet-roadtrip/
 // @run-at      document-start
 // @require     https://cdn.jsdelivr.net/npm/internet-roadtrip-framework@0.4.1-beta
 // @require     https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js
 // ==/UserScript==
-import IRF from 'internet-roadtrip-framework';
-import _ from 'lodash';
 
-(async () => {
+(async () => {  
     if (!IRF.isInternetRoadtrip) return;
 
     const optionsBody = await IRF.dom.options;
@@ -24,7 +25,54 @@ import _ from 'lodash';
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
 
-    document.addEventListener('keydown', handler);
+    GM_addStyle(`
+#input-device {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    #the-unhider {
+        width: 30%;
+        height: 30vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        #input-element {
+            border-radius: 9999px;
+            opacity: 0;
+        }
+    }
+
+    #the-unhider:hover #input-element {
+        opacity: 1;
+    }
+}
+    `)
+
+    const inputDevice = document.createElement('div');
+    inputDevice.id = 'input-device';
+    document.body.appendChild(inputDevice);
+
+    const unHider = document.createElement('div');
+    unHider.id = 'the-unhider';
+    inputDevice.appendChild(unHider);
+
+
+    const inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.id = 'input-element'
+    inputElement.readOnly = true;
+
+    unHider.appendChild(inputElement);
+
+    inputElement.addEventListener('keydown', handler);
 
     function handler(e) {
         switch (e.code) {
@@ -157,7 +205,7 @@ import _ from 'lodash';
         justify-content: space-between;
         margin-bottom: 0.5rem;
     
-        input[type=button] {
+        input[type=text] {
             padding: 0.35rem 1rem;
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -180,7 +228,8 @@ import _ from 'lodash';
     labelOne.textContent = 'hehee';
 
     const buttonOne = document.createElement('input')
-    buttonOne.type = 'button';
+    buttonOne.type = 'text';
+    buttonOne.readOnly = true;
     
     tab.container.appendChild(testRow);
     testRow.appendChild(labelOne);
