@@ -40,8 +40,8 @@
     pointer-events: none;
 
     #the-unhider {
-        width: 30%;
-        height: 30vh;
+        width: 25%;
+        height: 25vh;
         display: flex;
         align-items: center;
         justify-content: center;
