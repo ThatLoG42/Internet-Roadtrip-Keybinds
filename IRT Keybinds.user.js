@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.4.1
+// @version     0.4.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -317,10 +317,19 @@
             border: 1px solid rgb(68, 68, 170);
             background: rgb(68, 68, 170);
         }
+    
+        input[type=text].conflict {
+            color:red;
+        }
     }
     `
     tab.container.appendChild(tabStyle);
-    
+    let instructionsRow = document.createElement('div');
+    instructionsRow.classList.add('row');
+    let instructionsLabel = document.createElement('ul');
+    instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li>'
+    instructionsRow.appendChild(instructionsLabel);
+    tab.container.appendChild(instructionsRow);
     for (const key in keybindNames) {
         if (Object.hasOwnProperty.call(keybindNames, key)) {
             let keybindRow = document.createElement('div');
@@ -349,6 +358,7 @@
             keybindInputStorage[key] = keybindInput;
         }
     }
+    checkForConflicts();
     let resetRow = document.createElement('div');
     resetRow.classList.add('row');
     let resetAllButton = document.createElement('button');
@@ -372,6 +382,7 @@
         settings[key] = formattedEvent;
         await GM.setValue(key,settings[key])
         keybindInput.value = settings[key];
+        checkForConflicts();
     }
 
     /**
@@ -384,6 +395,7 @@
         settings[key] = ogSetting;
         await GM.setValue(key,ogSetting);
         keybindInput.value = ogSetting;
+        checkForConflicts();
     }
 
     async function resetAll() {
@@ -410,24 +422,24 @@
         return `${arr.filter((word) => word.length > 0).join(' + ')}`;
     }
 
-    // function checkForConflicts() {
-    //     for (const key in keybindInputStorage) {
-    //         if (Object.hasOwnProperty.call(keybindInputStorage, key)) {
-    //             const keybindInput = keybindInputStorage[key];
-    //             let thingy = false;
-    //             for (const otherKey in object) {
-    //                 if (Object.hasOwnProperty.call(object, otherKey) && key !== otherKey) {
-    //                     if (keybindInput.value === object[otherKey].value) {
-    //                         thingy = true;
-    //                         keybindInput.classList.add('conflict');
-    //                         continue;
-    //                     }
-    //                 }
-    //             }
-    //             if (!thingy) {
-    //                 keybindInput.classList.remove('conflict');
-    //             }
-    //         }
-    //     }
-    // }
+    function checkForConflicts() {
+        for (const key in keybindInputStorage) {
+            if (Object.hasOwnProperty.call(keybindInputStorage, key)) {
+                const keybindInput = keybindInputStorage[key];
+                let thingy = false;
+                for (const otherKey in keybindInputStorage) {
+                    if (Object.hasOwnProperty.call(keybindInputStorage, otherKey) && key !== otherKey) {
+                        if (keybindInput.value === keybindInputStorage[otherKey].value) {
+                            thingy = true;
+                            keybindInput.classList.add('conflict');
+                            break;
+                        }
+                    }
+                }
+                if (!thingy) {
+                    keybindInput.classList.remove('conflict');
+                }
+            }
+        }
+    }
 })();

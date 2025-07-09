@@ -25,6 +25,10 @@
         border: 1px solid rgb(68, 68, 170);
         background: rgb(68, 68, 170);
     }
+
+    input[type=text].conflict {
+        color:red;
+    }
 }
 
 #input-device {
