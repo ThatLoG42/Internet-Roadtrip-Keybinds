@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.4.2
+// @version     1.0
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -327,7 +327,7 @@
     let instructionsRow = document.createElement('div');
     instructionsRow.classList.add('row');
     let instructionsLabel = document.createElement('ul');
-    instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li>'
+    instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li><li>Use Escape on a keybind button to unbind keybind</li>'
     instructionsRow.appendChild(instructionsLabel);
     tab.container.appendChild(instructionsRow);
     for (const key in keybindNames) {
@@ -347,9 +347,7 @@
             }
 
             keybindInput.ondblclick = async function(){
-                if(confirm('Are you sure you want to reset this keybind? THIS IS IRREVERSIBLE!')) {
-                    await resetKeybind(keybindInput,key);
-                }
+                await resetKeybind(keybindInput,key);
             }
             
             tab.container.appendChild(keybindRow);
@@ -378,6 +376,13 @@
      * @param {KeyboardEvent} e 
      */
     async function updateKeybind(keybindInput,key,e) {
+        if (e.code === 'Escape') {
+            settings[key] = 'Not Bound';
+            await GM.setValue(key,settings[key])
+            keybindInput.value = settings[key];
+            checkForConflicts();
+            return;
+        }
         const formattedEvent = formatKeyEvent(e);
         settings[key] = formattedEvent;
         await GM.setValue(key,settings[key])
@@ -427,6 +432,10 @@
             if (Object.hasOwnProperty.call(keybindInputStorage, key)) {
                 const keybindInput = keybindInputStorage[key];
                 let thingy = false;
+                if (keybindInput.value === 'Not Bound') {
+                    keybindInput.classList.remove('conflict');
+                    continue;
+                }
                 for (const otherKey in keybindInputStorage) {
                     if (Object.hasOwnProperty.call(keybindInputStorage, otherKey) && key !== otherKey) {
                         if (keybindInput.value === keybindInputStorage[otherKey].value) {
