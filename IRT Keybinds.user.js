@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3.0.4.2
+// @version     0.3.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -79,7 +79,9 @@
 
     unHider.appendChild(inputElement);
 
-    inputElement.addEventListener('keydown', handler);
+    inputElement.onkeydown = function(e) {
+        handler(e);
+    }
 
     /**
      * 
@@ -257,17 +259,25 @@
     buttonOne.type = 'text';
     buttonOne.readOnly = true;
     buttonOne.onkeydown = function(e){
-        let shift = e.shiftKey ? 'Shift' : ''
-        let meta = e.metaKey ? 'Meta' : ''
-        let ctrl = e.ctrlKey ? 'Ctrl' : ''
-        let alt = e.altKey ? 'Alt' : ''
-        
-        let arr = [ctrl,alt,shift,meta,(['Control','Shift','Alt','Meta'].some(sub => e.code.startsWith(sub)) ? '' : e.code)];
-        
-        buttonOne.value = `${arr.filter((word) => word.length > 0).join(' + ')}`;
+        keyToFormat(e);
     }
     
     tab.container.appendChild(testRow);
     testRow.appendChild(labelOne);
     testRow.appendChild(buttonOne);
+
+    /**
+     * 
+     * @param {KeyboardEvent} e 
+     */
+    function keyToFormat(e) {
+        let shift = e.shiftKey ? 'Shift' : '';
+        let meta = e.metaKey ? 'Meta' : '';
+        let ctrl = e.ctrlKey ? 'Ctrl' : '';
+        let alt = e.altKey ? 'Alt' : '';
+        
+        let arr = [ctrl,alt,shift,meta,(['Control','Shift','Alt','Meta'].some(sub => e.code.startsWith(sub)) ? '' : e.code)];
+        
+        buttonOne.value = `${arr.filter((word) => word.length > 0).join(' + ')}`;
+    }
 })();
