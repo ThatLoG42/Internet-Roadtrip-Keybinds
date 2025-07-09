@@ -4,7 +4,7 @@
     justify-content: space-between;
     margin-bottom: 0.5rem;
 
-    input[type=button] {
+    input[type=text] {
         padding: 0.35rem 1rem;
         cursor: pointer;
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -15,6 +15,15 @@
         font-family: inherit;
         transition: 0.2s;
         white-space: nowrap;
+    }
+
+    input[type=text]:hover {
+        background: rgba(68, 68, 170, 0.1);
+    }
+
+    input[type=text]:active {
+        border: 1px solid rgb(68, 68, 170);
+        background: rgb(68, 68, 170);
     }
 }
 
