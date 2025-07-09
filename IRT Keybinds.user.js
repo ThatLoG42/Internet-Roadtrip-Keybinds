@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3.0.3
+// @version     0.3.0.4
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -50,6 +50,8 @@
         pointer-events: auto;
         #input-element {
             border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgb(0,0,0);
             opacity: 0;
         }
     }
@@ -77,6 +79,11 @@
     unHider.appendChild(inputElement);
 
     inputElement.addEventListener('keydown', handler);
+
+    /**
+     * 
+     * @param {KeyboardEvent} e 
+     */
 
     function handler(e) {
         switch (e.code) {
@@ -122,6 +129,11 @@
         radioVDOM.methods.updateVolumeFromAngle(-Math.PI/2 + rotation);
     }
 
+    /**
+     * 
+     * @param {KeyboardEvent} e 
+     * @returns 
+     */
     function chooseOption(e) {
         const optionSelect = {
             'Digit1': 0,
@@ -243,6 +255,9 @@
     const buttonOne = document.createElement('input')
     buttonOne.type = 'text';
     buttonOne.readOnly = true;
+    buttonOne.onkeydown = function(e){
+        buttonOne.value = e.key;
+    }
     
     tab.container.appendChild(testRow);
     testRow.appendChild(labelOne);
