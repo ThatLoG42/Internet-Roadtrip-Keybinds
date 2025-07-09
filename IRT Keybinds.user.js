@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.0
+// @version     1.0.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -327,9 +327,10 @@
     let instructionsRow = document.createElement('div');
     instructionsRow.classList.add('row');
     let instructionsLabel = document.createElement('ul');
-    instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li><li>Use Escape on a keybind button to unbind keybind</li>'
+    instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li><li>Type Escape on a keybind button to unbind keybinds</li><li>Conflicts are marked in red text</li><li>The text on the button after you type in the keybind may be different from what you typed. This is due to keyboard differences. The keybind should still be what you typed.</li>';
     instructionsRow.appendChild(instructionsLabel);
     tab.container.appendChild(instructionsRow);
+    tab.container.appendChild(document.createElement('hr'));
     for (const key in keybindNames) {
         if (Object.hasOwnProperty.call(keybindNames, key)) {
             let keybindRow = document.createElement('div');
@@ -424,7 +425,7 @@
         
         let arr = [ctrl,alt,shift,meta,(['Control','Shift','Alt','Meta'].some(sub => e.code.startsWith(sub)) ? '' : e.code)];
         
-        return `${arr.filter((word) => word.length > 0).join(' + ')}`;
+        return arr.filter((word) => word.length > 0).join(' + ');
     }
 
     function checkForConflicts() {
