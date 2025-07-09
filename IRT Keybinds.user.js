@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3.1
+// @version     0.3.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
 // @grant       GM.addStyle
 // @grant       GM.info
+// @grant       GM.getValue
+// @grant       GM.setValue
 // @match       https://neal.fun/internet-roadtrip/
 // @run-at      document-start
 // @icon        https://files.catbox.moe/ip5hzt.png
@@ -29,6 +31,67 @@
     const optionsVDOM = await IRF.vdom.options;
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
+
+    const defaultKeybinds = {
+        option0: 'Digit1',
+        option1: 'Digit2',
+        option2: 'Digit3',
+        option3: 'Digit4',
+        option4: 'Digit5',
+        option5: 'Digit6',
+        option6: 'Digit7',
+        option7: 'Digit8',
+        option8: 'Digit9',
+        option9: 'Digit0',
+        option10: 'Minus',
+        option11: 'Equal',
+        forward: 'KeyW',
+        left: 'KeyA',
+        right: 'KeyD',
+        seek: 'KeyS',
+        honk: 'Space',
+        radioPower: 'KeyR',
+        radioVolDown: 'Comma',
+        radioVolUp: 'Period',
+        mapExpand: 'KeyE',
+        toggleChat: 'KeyT',
+        openDiscord: 'Shift + Backquote',
+        bandwagon: 'Shift + Slash'
+    };
+
+    const keybindNames = {
+        option0: 'Option 1',
+        option1: 'Option 2',
+        option2: 'Option 3',
+        option3: 'Option 4',
+        option4: 'Option 5',
+        option5: 'Option 6',
+        option6: 'Option 7',
+        option7: 'Option 8',
+        option8: 'Option 9',
+        option9: 'Option 10',
+        option10: 'Option 11',
+        option11: 'Option 12',
+        forward: 'Forward',
+        left: 'Left',
+        right: 'Right',
+        seek: 'Seek',
+        honk: 'Honk',
+        radioPower: 'Power On/Off Radio',
+        radioVolDown: 'Radio Volume Down',
+        radioVolUp: 'Radio Volume Up',
+        mapExpand: 'Expand/Contract Map',
+        toggleChat: 'Open/Close Chat Window',
+        openDiscord: 'Open Discord Server',
+        bandwagon: 'Bandwagon',
+    };
+
+    const settings = {}
+    for (const option in defaultKeybinds) {
+        if (Object.hasOwnProperty.call(defaultKeybinds, option)) {
+            settings[option] = await GM.getValue(option,defaultKeybinds[option]);
+        }
+    }
 
     await GM.addStyle(`
 #input-device {
@@ -89,7 +152,8 @@
      */
 
     function handler(e) {
-        switch (e.code) {
+        let formattedKeyEvent = keyToFormat(e);
+        switch (formattedKeyEvent) {
             case 'KeyR':
                 radioVDOM.methods.togglePower();
                 break;
@@ -249,22 +313,28 @@
     `
     tab.container.appendChild(tabStyle);
 
-    const testRow = document.createElement('div');
-    testRow.classList.add('row');
-
-    const labelOne = document.createElement('label');
-    labelOne.textContent = 'hehee';
-
-    const buttonOne = document.createElement('input')
-    buttonOne.type = 'text';
-    buttonOne.readOnly = true;
-    buttonOne.onkeydown = function(e){
-        keyToFormat(e);
+    for (const key in keybindNames) {
+        if (Object.hasOwnProperty.call(keybindNames, key)) {
+            let keybindRow = document.createElement('div');
+            keybindRow.classList.add('row');
+        
+            let labelName = document.createElement('label');
+            labelName.textContent = keybindNames[key];
+        
+            let keybindInput = document.createElement('input')
+            keybindInput.type = 'text';
+            keybindInput.readOnly = true;
+            keybindInput.value = settings[key]
+            keybindInput.onkeydown = function(e){
+                keybindInput.value = keyToFormat(e);
+            }
+            
+            tab.container.appendChild(keybindRow);
+            keybindRow.appendChild(labelName);
+            keybindRow.appendChild(keybindInput);
+            
+        }
     }
-    
-    tab.container.appendChild(testRow);
-    testRow.appendChild(labelOne);
-    testRow.appendChild(buttonOne);
 
     /**
      * 
@@ -278,6 +348,6 @@
         
         let arr = [ctrl,alt,shift,meta,(['Control','Shift','Alt','Meta'].some(sub => e.code.startsWith(sub)) ? '' : e.code)];
         
-        buttonOne.value = `${arr.filter((word) => word.length > 0).join(' + ')}`;
+        return `${arr.filter((word) => word.length > 0).join(' + ')}`;
     }
 })();
