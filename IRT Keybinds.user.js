@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.4
+// @version     0.4.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -31,7 +31,7 @@
     const optionsVDOM = await IRF.vdom.options;
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
-
+    let keybindInputStorage = {}
     const defaultKeybinds = {
         option0: 'Digit1',
         option1: 'Digit2',
@@ -86,7 +86,7 @@
         bandwagon: 'Bandwagon',
     };
 
-    const settings = {}
+    let settings = {}
     for (const option in defaultKeybinds) {
         if (Object.hasOwnProperty.call(defaultKeybinds, option)) {
             settings[option] = await GM.getValue(option,defaultKeybinds[option]);
@@ -296,7 +296,7 @@
         justify-content: space-between;
         margin-bottom: 0.5rem;
     
-        input[type=text] {
+        input[type=text], button {
             padding: 0.35rem 1rem;
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -309,18 +309,18 @@
             white-space: nowrap;
         }
     
-        input[type=text]:hover {
+        input[type=text]:hover, button:hover {
             background: rgba(68, 68, 170, 0.1);
         }
     
-        input[type=text]:focus {
+        input[type=text]:focus, button:active {
             border: 1px solid rgb(68, 68, 170);
             background: rgb(68, 68, 170);
         }
     }
     `
     tab.container.appendChild(tabStyle);
-    let keybindInputStorage = {}
+    
     for (const key in keybindNames) {
         if (Object.hasOwnProperty.call(keybindNames, key)) {
             let keybindRow = document.createElement('div');
@@ -338,7 +338,9 @@
             }
 
             keybindInput.ondblclick = async function(){
-                await resetKeybind(keybindInput,key)
+                if(confirm('Are you sure you want to reset this keybind? THIS IS IRREVERSIBLE!')) {
+                    await resetKeybind(keybindInput,key);
+                }
             }
             
             tab.container.appendChild(keybindRow);
@@ -347,6 +349,18 @@
             keybindInputStorage[key] = keybindInput;
         }
     }
+    let resetRow = document.createElement('div');
+    resetRow.classList.add('row');
+    let resetAllButton = document.createElement('button');
+    resetAllButton.textContent = 'Reset All'
+    resetAllButton.onclick = async function() {
+        if(confirm('Are you sure you want to reset all keybinds? THIS IS IRREVERSIBLE!')) {
+            await resetAll();
+        }
+    };
+    resetRow.appendChild(resetAllButton);
+    tab.container.appendChild(resetRow);
+
     /**
      * 
      * @param {HTMLInputElement} keybindInput 
@@ -372,6 +386,15 @@
         keybindInput.value = ogSetting;
     }
 
+    async function resetAll() {
+        for (const key in keybindInputStorage) {
+            if (Object.hasOwnProperty.call(keybindInputStorage, key)) {
+                const keybindInput = keybindInputStorage[key];
+                await resetKeybind(keybindInput,key)
+            }
+        }
+    }
+
     /**
      * 
      * @param {KeyboardEvent} e 
@@ -386,4 +409,25 @@
         
         return `${arr.filter((word) => word.length > 0).join(' + ')}`;
     }
+
+    // function checkForConflicts() {
+    //     for (const key in keybindInputStorage) {
+    //         if (Object.hasOwnProperty.call(keybindInputStorage, key)) {
+    //             const keybindInput = keybindInputStorage[key];
+    //             let thingy = false;
+    //             for (const otherKey in object) {
+    //                 if (Object.hasOwnProperty.call(object, otherKey) && key !== otherKey) {
+    //                     if (keybindInput.value === object[otherKey].value) {
+    //                         thingy = true;
+    //                         keybindInput.classList.add('conflict');
+    //                         continue;
+    //                     }
+    //                 }
+    //             }
+    //             if (!thingy) {
+    //                 keybindInput.classList.remove('conflict');
+    //             }
+    //         }
+    //     }
+    // }
 })();
