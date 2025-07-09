@@ -11,7 +11,7 @@
 // @grant       GM.setValue
 // @match       https://neal.fun/internet-roadtrip/
 // @run-at      document-start
-// @icon        https://files.catbox.moe/ip5hzt.png
+// @icon        https://files.catbox.moe/o5iu1d.png
 // @require     https://cdn.jsdelivr.net/npm/internet-roadtrip-framework@0.4.1-beta
 // @require     https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js
 // @require     https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
