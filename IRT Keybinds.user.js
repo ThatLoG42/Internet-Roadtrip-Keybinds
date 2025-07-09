@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3.0.2
+// @version     0.3.0.3
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -226,7 +226,7 @@
             background: rgba(68, 68, 170, 0.1);
         }
     
-        input[type=text]:active {
+        input[type=text]:focus {
             border: 1px solid rgb(68, 68, 170);
             background: rgb(68, 68, 170);
         }
