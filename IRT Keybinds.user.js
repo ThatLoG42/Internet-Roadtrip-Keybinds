@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3.0.4.1
+// @version     0.3.0.4.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -9,6 +9,7 @@
 // @grant       GM.info
 // @match       https://neal.fun/internet-roadtrip/
 // @run-at      document-start
+// @icon        https://files.catbox.moe/ip5hzt.png
 // @require     https://cdn.jsdelivr.net/npm/internet-roadtrip-framework@0.4.1-beta
 // @require     https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js
 // @require     https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
@@ -256,7 +257,14 @@
     buttonOne.type = 'text';
     buttonOne.readOnly = true;
     buttonOne.onkeydown = function(e){
-        buttonOne.value = e.key;
+        let shift = e.shiftKey ? 'Shift' : ''
+        let meta = e.metaKey ? 'Meta' : ''
+        let ctrl = e.ctrlKey ? 'Ctrl' : ''
+        let alt = e.altKey ? 'Alt' : ''
+        
+        let arr = [ctrl,alt,shift,meta,(['Control','Shift','Alt','Meta'].some(sub => e.code.startsWith(sub)) ? '' : e.code)];
+        
+        buttonOne.value = `${arr.filter((word) => word.length > 0).join(' + ')}`;
     }
     
     tab.container.appendChild(testRow);
