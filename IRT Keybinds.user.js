@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3.2
+// @version     0.4
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -152,38 +152,34 @@
      */
 
     function handler(e) {
-        let formattedKeyEvent = keyToFormat(e);
+        let formattedKeyEvent = formatKeyEvent(e);
         switch (formattedKeyEvent) {
-            case 'KeyR':
+            case settings.radioPower:
                 radioVDOM.methods.togglePower();
                 break;
-            case 'KeyS':
+            case settings.seek:
                 radioVDOM.methods.seek();
                 break;
-            case 'Space':
+            case settings.honk:
                 wheelVDOM.methods.onHonkClick();
                 break;
-            case 'KeyE':
+            case settings.mapExpand:
                 mapVDOM.methods.toggleExpand();
                 break;
-            case 'Comma':
+            case settings.radioVolDown:
                 volSetter(radioVDOM.data.volume - 5);
                 break;
-            case 'Period':
+            case settings.radioVolUp:
                 volSetter(radioVDOM.data.volume + 5);
                 break;
-            case 'Slash':
-                if (e.key === '?') {
-                    bandwagon();
-                }
+            case settings.bandwagon:
+                bandwagon();
                 break;
-            case 'KeyT':
+            case settings.toggleChat:
                 chatVDOM.methods.toggleChat();
                 break;
-            case 'Backquote':
-                if (e.key === '~') {
-                    chatVDOM.methods.openDiscord();
-                }
+            case settings.openDiscord:
+                chatVDOM.methods.openDiscord();
                 break;
             default:
                 chooseOption(e);
@@ -202,40 +198,52 @@
      * @returns 
      */
     function chooseOption(e) {
-        const optionSelect = {
-            'Digit1': 0,
-            'Digit2': 1,
-            'Digit3': 2,
-            'Digit4': 3,
-            'Digit5': 4,
-            'Digit6': 5,
-            'Digit7': 6,
-            'Digit8': 7,
-            'Digit9': 8,
-            'Digit0': 9,
-            'Minus': 10,
-            'Equal': 11
-        };
+        const formattedKey = formatKeyEvent(e)
+        const optionSelect = [
+            'option0',
+            'option1',
+            'option2',
+            'option3',
+            'option4',
+            'option5',
+            'option6',
+            'option7',
+            'option8',
+            'option9',
+            'option10',
+            'option11'
+        ];
         const options = optionsBody.getElementsByClassName('option');
         const optionsSorted = _.sortBy(options,function (option) {return getRotation(option);})
-        if (optionSelect.hasOwnProperty(e.code)){
-            if (optionsSorted[optionSelect[e.code]]) {
-                optionsSorted[optionSelect[e.code]].click();
-                return;
+        // if (optionSelect.hasOwnProperty(e.code)){
+        //     if (optionsSorted[optionSelect[e.code]]) {
+        //         optionsSorted[optionSelect[e.code]].click();
+        //         return;
+        //     }
+        // }
+
+        for (let i = 0; i < optionSelect.length; i++) {
+            const element = optionSelect[i];
+            if (settings[element] === formattedKey) {
+                if (optionsSorted[i]) {
+                    optionsSorted[i].click();
+                    return;
+                }
             }
         }
-        switch (e.code) {
-            case 'KeyA':
+
+        switch (formattedKey) {
+            case settings.left:
                 if (optionsSorted[0]) {
                     optionsSorted[0].click();
                 }
                 break;
-            case 'KeyD':
+            case settings.right:
                 if (optionsSorted.at(-1)) {
                     optionsSorted.at(-1).click();
                 }
                 break;
-            case 'KeyW': {
+            case settings.forward: {
                 let middle = _.minBy(optionsSorted,function(option) {return Math.abs(getRotation(option));})
                 if (middle) {
                     middle.click();
@@ -312,7 +320,7 @@
     }
     `
     tab.container.appendChild(tabStyle);
-
+    let keybindInputStorage = {}
     for (const key in keybindNames) {
         if (Object.hasOwnProperty.call(keybindNames, key)) {
             let keybindRow = document.createElement('div');
@@ -325,22 +333,50 @@
             keybindInput.type = 'text';
             keybindInput.readOnly = true;
             keybindInput.value = settings[key]
-            keybindInput.onkeydown = function(e){
-                keybindInput.value = keyToFormat(e);
+            keybindInput.onkeydown = async function(e){
+                await updateKeybind(keybindInput,key,e);
+            }
+
+            keybindInput.ondblclick = async function(){
+                await resetKeybind(keybindInput,key)
             }
             
             tab.container.appendChild(keybindRow);
             keybindRow.appendChild(labelName);
             keybindRow.appendChild(keybindInput);
-            
+            keybindInputStorage[key] = keybindInput;
         }
+    }
+    /**
+     * 
+     * @param {HTMLInputElement} keybindInput 
+     * @param {string} key 
+     * @param {KeyboardEvent} e 
+     */
+    async function updateKeybind(keybindInput,key,e) {
+        const formattedEvent = formatKeyEvent(e);
+        settings[key] = formattedEvent;
+        await GM.setValue(key,settings[key])
+        keybindInput.value = settings[key];
+    }
+
+    /**
+     * 
+     * @param {HTMLInputElement} keybindInput 
+     * @param {string} key 
+     */
+    async function resetKeybind(keybindInput,key) {
+        const ogSetting = defaultKeybinds[key];
+        settings[key] = ogSetting;
+        await GM.setValue(key,ogSetting);
+        keybindInput.value = ogSetting;
     }
 
     /**
      * 
      * @param {KeyboardEvent} e 
      */
-    function keyToFormat(e) {
+    function formatKeyEvent(e) {
         let shift = e.shiftKey ? 'Shift' : '';
         let meta = e.metaKey ? 'Meta' : '';
         let ctrl = e.ctrlKey ? 'Ctrl' : '';
