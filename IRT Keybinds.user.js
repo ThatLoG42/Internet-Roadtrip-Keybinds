@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.0.1
+// @version     1.0.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -31,7 +31,7 @@
     const optionsVDOM = await IRF.vdom.options;
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
-    let keybindInputStorage = {}
+    
     const defaultKeybinds = {
         option0: 'Digit1',
         option1: 'Digit2',
@@ -85,7 +85,13 @@
         openDiscord: 'Open Discord Server',
         bandwagon: 'Bandwagon'
     };
-
+    /**
+     * @type {Object.<string,HTMLInputElement>} keybindInputStorage
+     */
+    let keybindInputStorage = {}
+    /**
+     * @type {Object.<string,string>} settings
+     */
     let settings = {}
     for (const option in defaultKeybinds) {
         if (Object.hasOwnProperty.call(defaultKeybinds, option)) {
@@ -429,25 +435,23 @@
     }
 
     function checkForConflicts() {
+        /**
+         * @type {Map<string,HTMLInputElement>} conflictMap
+         */
+        let conflictMap = new Map()
+
         for (const key in keybindInputStorage) {
             if (Object.hasOwnProperty.call(keybindInputStorage, key)) {
                 const keybindInput = keybindInputStorage[key];
-                let thingy = false;
+                keybindInput.classList.remove('conflict');
                 if (keybindInput.value === 'Not Bound') {
-                    keybindInput.classList.remove('conflict');
                     continue;
                 }
-                for (const otherKey in keybindInputStorage) {
-                    if (Object.hasOwnProperty.call(keybindInputStorage, otherKey) && key !== otherKey) {
-                        if (keybindInput.value === keybindInputStorage[otherKey].value) {
-                            thingy = true;
-                            keybindInput.classList.add('conflict');
-                            break;
-                        }
-                    }
-                }
-                if (!thingy) {
-                    keybindInput.classList.remove('conflict');
+                if (conflictMap.has(keybindInput.value)) {
+                    keybindInput.classList.add('conflict')
+                    conflictMap.get(keybindInput.value).classList.add('conflict')
+                } else {
+                    conflictMap.set(keybindInput.value,keybindInput);
                 }
             }
         }
