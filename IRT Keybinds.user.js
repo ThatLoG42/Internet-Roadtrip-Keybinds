@@ -83,7 +83,7 @@
         mapExpand: 'Expand/Contract Map',
         toggleChat: 'Open/Close Chat Window',
         openDiscord: 'Open Discord Server',
-        bandwagon: 'Bandwagon',
+        bandwagon: 'Bandwagon'
     };
 
     let settings = {}
