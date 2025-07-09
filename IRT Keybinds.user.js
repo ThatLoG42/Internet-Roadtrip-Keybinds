@@ -1,15 +1,17 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     0.3
+// @version     0.3.0.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
-// @grant       GM_addStyle
+// @grant       GM.addStyle
+// @grant       GM.info
 // @match       https://neal.fun/internet-roadtrip/
 // @run-at      document-start
 // @require     https://cdn.jsdelivr.net/npm/internet-roadtrip-framework@0.4.1-beta
 // @require     https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js
+// @require     https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
 // ==/UserScript==
 
 // type hints
@@ -27,7 +29,7 @@
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
 
-    GM_addStyle(`
+    await GM.addStyle(`
 #input-device {
     position: fixed;
     top: 0;
