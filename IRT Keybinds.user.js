@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.0.2
+// @version     1.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -99,56 +99,7 @@
         }
     }
 
-    await GM.addStyle(`
-#input-device {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-
-    #the-unhider {
-        width: 25%;
-        height: 25vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: auto;
-        #input-element {
-            border-radius: 9999px;
-            border: 1px solid rgb(0,0,0);
-            background: rgb(255,255,255);
-            opacity: 0;
-        }
-    }
-
-    #the-unhider:hover #input-element {
-        opacity: 1;
-    }
-}
-    `)
-
-    const inputDevice = document.createElement('div');
-    inputDevice.id = 'input-device';
-    document.body.appendChild(inputDevice);
-
-    const unHider = document.createElement('div');
-    unHider.id = 'the-unhider';
-    inputDevice.appendChild(unHider);
-
-
-    const inputElement = document.createElement('input');
-    inputElement.type = 'text';
-    inputElement.id = 'input-element'
-    inputElement.readOnly = true;
-
-    unHider.appendChild(inputElement);
-
-    inputElement.onkeydown = function(e) {
+    window.onkeydown = function(e) {
         handler(e);
     }
 
@@ -158,6 +109,9 @@
      */
 
     function handler(e) {
+        if (e.target !== document.body) {
+            return;
+        }
         let formattedKeyEvent = formatKeyEvent(e);
         switch (formattedKeyEvent) {
             case settings.radioPower:
