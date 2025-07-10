@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.1
+// @version     1.1.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -99,7 +99,7 @@
         }
     }
 
-    window.onkeydown = function(e) {
+    document.onkeydown = function(e) {
         handler(e);
     }
 
