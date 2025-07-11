@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.1.1
+// @version     1.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -98,10 +98,7 @@
             settings[option] = await GM.getValue(option,defaultKeybinds[option]);
         }
     }
-
-    document.onkeydown = function(e) {
-        handler(e);
-    }
+    document.addEventListener('keydown', handler);
 
     /**
      * 
@@ -302,14 +299,14 @@
             let keybindInput = document.createElement('input')
             keybindInput.type = 'text';
             keybindInput.readOnly = true;
-            keybindInput.value = settings[key]
-            keybindInput.onkeydown = async function(e){
+            keybindInput.value = settings[key];
+            keybindInput.addEventListener('keydown', async function(e){
                 await updateKeybind(keybindInput,key,e);
-            }
+            });
 
-            keybindInput.ondblclick = async function(){
+            keybindInput.addEventListener('dblclick', async function(){
                 await resetKeybind(keybindInput,key);
-            }
+            });
             
             tab.container.appendChild(keybindRow);
             keybindRow.appendChild(labelName);
@@ -322,11 +319,12 @@
     resetRow.classList.add('row');
     let resetAllButton = document.createElement('button');
     resetAllButton.textContent = 'Reset All'
-    resetAllButton.onclick = async function() {
+    resetAllButton.addEventListener('click', async function() {
         if(confirm('Are you sure you want to reset all keybinds? THIS IS IRREVERSIBLE!')) {
             await resetAll();
         }
-    };
+    })
+
     resetRow.appendChild(resetAllButton);
     tab.container.appendChild(resetRow);
 
