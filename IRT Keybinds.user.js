@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.1.2
+// @version     1.2
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -48,6 +48,7 @@
         forward: 'KeyW',
         left: 'KeyA',
         right: 'KeyD',
+        pathfinder: 'KeyQ',
         seek: 'KeyS',
         honk: 'Space',
         radioPower: 'KeyR',
@@ -72,9 +73,10 @@
         option9: 'Option 10',
         option10: 'Option 11',
         option11: 'Option 12',
-        forward: 'Forward',
-        left: 'Left',
-        right: 'Right',
+        forward: 'Forwardmost Option',
+        left: 'Leftmost Option',
+        right: 'Rightmost Option',
+        pathfinder: 'Pathfinder Option',
         seek: 'Seek',
         honk: 'Honk',
         radioPower: 'Power On/Off Radio',
@@ -204,6 +206,13 @@
                 let middle = _.minBy(optionsSorted,function(option) {return Math.abs(getRotation(option));})
                 if (middle) {
                     middle.click();
+                }
+            }
+                break;
+            case settings.pathfinder: {
+                let pathfinder = optionsBody.querySelector('.pathfinder-chosen-option');
+                if (pathfinder) {
+                    pathfinder.click();
                 }
             }
                 break;
