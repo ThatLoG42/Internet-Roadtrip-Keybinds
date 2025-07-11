@@ -3,6 +3,7 @@ A userscript that adds keybind functionality to Internet Roadtrip! ~~Now you can
 Features:
 - Selecting options by number (from left to right)
 - Selecting the leftmost, forwardmost, and rightmost option
+- Selecting the pathfinder option
 - Seeking
 - Honking
 - Turning on/off radio
