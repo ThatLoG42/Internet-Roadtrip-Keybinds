@@ -18,8 +18,8 @@
 // ==/UserScript==
 
 // type hints
-// import IRF from 'internet-roadtrip-framework';
-// import _ from 'lodash';
+import IRF from 'internet-roadtrip-framework';
+import _ from 'lodash';
 
 (async () => { 
     if (!IRF.isInternetRoadtrip) return;
@@ -101,6 +101,20 @@
         }
     }
     document.addEventListener('keydown', handler);
+
+    containerVDOM.state.updateData = new Proxy(containerVDOM.state.updateData, {
+        apply: (target,thisArgs,args) => {
+            let options = optionsBody.getElementsByClassName('option');
+            for (const item of options) {
+                if (item.firstChild.nodeName !== 'P') {
+                    let square = document.createElement('p');
+                    square.textContent = '2';
+                    item.insertBefore(square,item.firstChild);
+                }
+            }
+            return Reflect.apply(target, thisArgs, args);
+        }
+    })
 
     /**
      * 
