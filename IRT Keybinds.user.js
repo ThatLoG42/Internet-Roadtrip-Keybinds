@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.2
+// @version     1.3.beta1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -18,8 +18,8 @@
 // ==/UserScript==
 
 // type hints
-import IRF from 'internet-roadtrip-framework';
-import _ from 'lodash';
+// import IRF from 'internet-roadtrip-framework';
+// import _ from 'lodash';
 
 (async () => { 
     if (!IRF.isInternetRoadtrip) return;
@@ -32,7 +32,7 @@ import _ from 'lodash';
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
 
-    class OptionChoice {
+    class OptionChoices {
         /**
          * 
          * @param {HTMLCollectionOf<Element>} options 
@@ -41,11 +41,14 @@ import _ from 'lodash';
             this.options = _.sortBy(options,function (option) {return getRotation(option);});
             for (let i = 0; i < this.options.length; i++) {
                 let item = this.options[i];
+                let optionKey = i+1;
                 item.style.textAlign = 'center'
                 if (item.firstChild.nodeName && item.firstChild.nodeName !== 'H1') {
                     let square = document.createElement('H1');
-                    square.textContent = i;
+                    square.textContent = optionKey;
                     item.insertBefore(square,item.firstChild);
+                } else if (item.firstChild.nodeName && item.firstChild.nodeName === 'H1') {
+                    item.firstChild.textContent = optionKey;
                 }
             }
         }
@@ -145,7 +148,7 @@ import _ from 'lodash';
      * @type {Object.<string,string>} settings
      */
     let settings = {}
-    let optionSelection = new OptionChoice(optionsBody.getElementsByClassName('option'));
+    let optionSelection = new OptionChoices(optionsBody.getElementsByClassName('option'));
 
     for (const option in defaultKeybinds) {
         if (Object.hasOwnProperty.call(defaultKeybinds, option)) {
@@ -157,10 +160,11 @@ import _ from 'lodash';
     containerVDOM.state.updateData = new Proxy(containerVDOM.state.updateData, {
         apply: (target,thisArgs,args) => {
             let options = optionsBody.getElementsByClassName('option');
-            new OptionChoice(options);
+            optionSelection = new OptionChoices(options);
             return Reflect.apply(target, thisArgs, args);
         }
     })
+
 
     /** 
      * 
@@ -232,8 +236,7 @@ import _ from 'lodash';
             'option10',
             'option11'
         ];
-        const options = optionsBody.getElementsByClassName('option');
-        const optionsSorted = _.sortBy(options,function (option) {return getRotation(option);})
+
         // if (optionSelect.hasOwnProperty(e.code)){
         //     if (optionsSorted[optionSelect[e.code]]) {
         //         optionsSorted[optionSelect[e.code]].click();
@@ -242,10 +245,11 @@ import _ from 'lodash';
         // }
 
         for (let i = 0; i < optionSelect.length; i++) {
-            const element = optionSelect[i];
+            const element = optionSelect[i];    
             if (settings[element] === formattedKey) {
-                if (optionsSorted[i]) {
-                    optionsSorted[i].click();
+                let option = optionSelection.getNthElement(i);
+                if (option) {
+                    option.click();
                     return;
                 }
             }
@@ -253,17 +257,17 @@ import _ from 'lodash';
 
         switch (formattedKey) {
             case settings.left:
-                if (optionsSorted[0]) {
-                    optionsSorted[0].click();
+                if (optionSelection.firstOption) {
+                    optionSelection.firstOption.click();
                 }
                 break;
             case settings.right:
-                if (optionsSorted.at(-1)) {
-                    optionsSorted.at(-1).click();
+                if (optionSelection.lastOption) {
+                    optionSelection.lastOption.click();
                 }
                 break;
             case settings.forward: {
-                let middle = _.minBy(optionsSorted,function(option) {return Math.abs(getRotation(option));})
+                let middle = optionSelection.middleOption;
                 if (middle) {
                     middle.click();
                 }
