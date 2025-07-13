@@ -30,3 +30,11 @@
         color:red;
     }
 }
+
+h1 {
+    top: -2vh;
+    font-size: 6vh;
+    -webkit-text-stroke: 0.2px white;
+    position: relative;
+    text-align: center;
+}

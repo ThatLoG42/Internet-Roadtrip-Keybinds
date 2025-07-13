@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.3.beta1
+// @version     1.3
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -32,6 +32,18 @@
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
 
+    let optionsStyle = document.createElement('style');
+    optionsStyle.textContent = `
+    h1 {
+        top: -2vh;
+        font-size: 6vh;
+        -webkit-text-stroke: 0.2px white;
+        position: relative;
+        text-align: center;
+    }
+    `
+    optionsBody.appendChild(optionsStyle);
+
     class OptionChoices {
         /**
          * 
@@ -42,11 +54,10 @@
             for (let i = 0; i < this.options.length; i++) {
                 let item = this.options[i];
                 let optionKey = i+1;
-                item.style.textAlign = 'center'
                 if (item.firstChild.nodeName && item.firstChild.nodeName !== 'H1') {
-                    let square = document.createElement('H1');
-                    square.textContent = optionKey;
-                    item.insertBefore(square,item.firstChild);
+                    let optionNumber = document.createElement('H1');
+                    optionNumber.textContent = optionKey;
+                    item.insertBefore(optionNumber,item.firstChild);
                 } else if (item.firstChild.nodeName && item.firstChild.nodeName === 'H1') {
                     item.firstChild.textContent = optionKey;
                 }
@@ -237,6 +248,7 @@
             'option11'
         ];
 
+        // og code
         // if (optionSelect.hasOwnProperty(e.code)){
         //     if (optionsSorted[optionSelect[e.code]]) {
         //         optionsSorted[optionSelect[e.code]].click();
