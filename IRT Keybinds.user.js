@@ -31,6 +31,56 @@ import _ from 'lodash';
     const optionsVDOM = await IRF.vdom.options;
     const radioVDOM = await IRF.vdom.radio;
     const wheelVDOM = await IRF.vdom.wheel;
+
+    class OptionChoice {
+        /**
+         * 
+         * @param {HTMLCollectionOf<Element>} options 
+         */
+        constructor(options) {
+            this.options = _.sortBy(options,function (option) {return getRotation(option);});
+            for (let i = 0; i < this.options.length; i++) {
+                let item = this.options[i];
+                item.style.textAlign = 'center'
+                if (item.firstChild.nodeName && item.firstChild.nodeName !== 'H1') {
+                    let square = document.createElement('H1');
+                    square.textContent = i;
+                    item.insertBefore(square,item.firstChild);
+                }
+            }
+        }
+        get firstOption() {
+            if (this.options[0]) {
+                return this.options[0];
+            }
+            return null;
+        }
+
+        get middleOption() {
+            let middle = _.minBy(this.options,function(option) {return Math.abs(getRotation(option));})
+            if (middle) {
+                return middle;
+            }
+            return null;
+        }
+
+        get lastOption() {
+            if (this.options.at(-1)) {
+                return this.options.at(-1);
+            }
+            return null;
+        }
+        /**
+         * 
+         * @param {Number} n 
+         */
+        getNthElement(n) {
+            if (this.options[n]) {
+                return this.options[n];
+            }
+            return null;
+        }
+    }
     
     const defaultKeybinds = {
         option0: 'Digit1',
@@ -95,6 +145,8 @@ import _ from 'lodash';
      * @type {Object.<string,string>} settings
      */
     let settings = {}
+    let optionSelection = new OptionChoice(optionsBody.getElementsByClassName('option'));
+
     for (const option in defaultKeybinds) {
         if (Object.hasOwnProperty.call(defaultKeybinds, option)) {
             settings[option] = await GM.getValue(option,defaultKeybinds[option]);
@@ -105,18 +157,12 @@ import _ from 'lodash';
     containerVDOM.state.updateData = new Proxy(containerVDOM.state.updateData, {
         apply: (target,thisArgs,args) => {
             let options = optionsBody.getElementsByClassName('option');
-            for (const item of options) {
-                if (item.firstChild.nodeName !== 'P') {
-                    let square = document.createElement('p');
-                    square.textContent = '2';
-                    item.insertBefore(square,item.firstChild);
-                }
-            }
+            new OptionChoice(options);
             return Reflect.apply(target, thisArgs, args);
         }
     })
 
-    /**
+    /** 
      * 
      * @param {KeyboardEvent} e 
      */
