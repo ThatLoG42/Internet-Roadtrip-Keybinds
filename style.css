@@ -31,7 +31,7 @@
     }
 }
 
-h1 {
+.option-number {
     top: -2vh;
     font-size: 6vh;
     -webkit-text-stroke: 0.2px white;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.3
+// @version     1.3.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -34,7 +34,7 @@
 
     let optionsStyle = document.createElement('style');
     optionsStyle.textContent = `
-    h1 {
+    .option-number {
         top: -2vh;
         font-size: 6vh;
         -webkit-text-stroke: 0.2px white;
@@ -54,12 +54,14 @@
             for (let i = 0; i < this.options.length; i++) {
                 let item = this.options[i];
                 let optionKey = i+1;
-                if (item.firstChild.nodeName && item.firstChild.nodeName !== 'H1') {
-                    let optionNumber = document.createElement('H1');
+
+                if (item.querySelector('.option-number')) {
+                    item.querySelector('.option-number').textContent = optionKey;
+                } else {
+                    let optionNumber = document.createElement('h1');
+                    optionNumber.classList.add('option-number');
                     optionNumber.textContent = optionKey;
                     item.insertBefore(optionNumber,item.firstChild);
-                } else if (item.firstChild.nodeName && item.firstChild.nodeName === 'H1') {
-                    item.firstChild.textContent = optionKey;
                 }
             }
         }
