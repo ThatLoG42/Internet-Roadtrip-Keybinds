@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.3.1
+// @version     1.4
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -91,8 +91,17 @@
          * @param {Number} n 
          */
         getNthElement(n) {
-            if (this.options[n]) {
-                return this.options[n];
+            if (!Number.isInteger(n)) {
+                return null;
+            }
+            if (n >= 0) {
+                if (this.options[n]) {
+                    return this.options[n];
+                }
+            } else {
+                if (this.options[this.options.length+n]) {
+                    return this.options[this.options.length+n];
+                }
             }
             return null;
         }
@@ -111,6 +120,7 @@
         option9: 'Digit0',
         option10: 'Minus',
         option11: 'Equal',
+        typeOptionNum: 'KeyF',
         forward: 'KeyW',
         left: 'KeyA',
         right: 'KeyD',
@@ -139,6 +149,7 @@
         option9: 'Option 10',
         option10: 'Option 11',
         option11: 'Option 12',
+        typeOptionNum: 'Type Option Number',
         forward: 'Forwardmost Option',
         left: 'Leftmost Option',
         right: 'Rightmost Option',
@@ -294,6 +305,21 @@
                 }
             }
                 break;
+            case settings.typeOptionNum: {
+                let optionNum = Number(prompt('Type in the option number you would like to click (1-indexed, from left).\nUse negative numbers to selected an option from right.\nType during the same stop to prevent unexpected behavior.'));
+
+                if (isNaN(optionNum) || !Number.isInteger(optionNum) || optionNum === 0) {
+                    alert('Not a valid option number!');
+                    break;
+                }
+                let optionChosen = optionNum < 0 ? optionSelection.getNthElement(optionNum) : optionSelection.getNthElement(optionNum-1);
+                if (optionChosen) {
+                    optionChosen.click();
+                    break;
+                } else {
+                    alert('Option doesn\'t exist!')
+                }
+            }
             default:
                 break;
         }
