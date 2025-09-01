@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.4
+// @version     1.4.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -181,14 +181,14 @@
     }
     document.addEventListener('keydown', handler);
 
-    containerVDOM.state.updateData = new Proxy(containerVDOM.state.updateData, {
+    const originalUpdateData = containerVDOM.methods.updateData;
+    containerVDOM.state.updateData = new Proxy(originalUpdateData, {
         apply: (target,thisArgs,args) => {
             let options = optionsBody.getElementsByClassName('option');
             optionSelection = new OptionChoices(options);
             return Reflect.apply(target, thisArgs, args);
         }
     })
-
 
     /** 
      * 
