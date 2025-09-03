@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.4.1
+// @version     1.5
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -9,6 +9,7 @@
 // @grant       GM.info
 // @grant       GM.getValue
 // @grant       GM.setValue
+// @grant       GM.deleteValue
 // @match       https://neal.fun/internet-roadtrip/
 // @run-at      document-start
 // @icon        https://files.catbox.moe/o5iu1d.png
@@ -43,6 +44,30 @@
     }
     `
     optionsBody.appendChild(optionsStyle);
+
+    let aisvApi;
+    const waitForAisvApi = new Promise((resolve) => {
+        if (unsafeWindow._AISV) {
+            resolve(unsafeWindow._AISV);
+        } else {
+            let aisvApi = unsafeWindow._AISV;
+            Object.defineProperty(unsafeWindow, '_AISV', {
+                get() {
+                    return aisvApi;
+                },
+                set(newAisvApi) {
+                    aisvApi = newAisvApi;
+                    resolve(aisvApi);
+                    return aisvApi;
+                },
+                configurable: true,
+                enumerable: true,
+            });
+        }
+    });
+    waitForAisvApi.then((newAisvApi) => {
+        aisvApi = newAisvApi;
+    });
 
     class OptionChoices {
         /**
@@ -108,32 +133,36 @@
     }
     
     const defaultKeybinds = {
-        option0: 'Digit1',
-        option1: 'Digit2',
-        option2: 'Digit3',
-        option3: 'Digit4',
-        option4: 'Digit5',
-        option5: 'Digit6',
-        option6: 'Digit7',
-        option7: 'Digit8',
-        option8: 'Digit9',
-        option9: 'Digit0',
-        option10: 'Minus',
-        option11: 'Equal',
-        typeOptionNum: 'KeyF',
-        forward: 'KeyW',
-        left: 'KeyA',
-        right: 'KeyD',
-        pathfinder: 'KeyQ',
-        seek: 'KeyS',
-        honk: 'Space',
-        radioPower: 'KeyR',
-        radioVolDown: 'Comma',
-        radioVolUp: 'Period',
-        mapExpand: 'KeyE',
-        toggleChat: 'KeyT',
-        openDiscord: 'Shift + Backquote',
-        bandwagon: 'Shift + Slash'
+        option0: '1',
+        option1: '2',
+        option2: '3',
+        option3: '4',
+        option4: '5',
+        option5: '6',
+        option6: '7',
+        option7: '8',
+        option8: '9',
+        option9: '0',
+        option10: '-',
+        option11: '=',
+        typeOptionNum: 'f',
+        forward: 'w',
+        left: 'a',
+        right: 'd',
+        pathfinder: 'q',
+        seek: 's',
+        forwardAISV: 'i',
+        leftAISV: 'j',
+        rightAISV: 'l',
+        seekAISV: 'k',
+        honk: ' ',
+        radioPower: 'r',
+        radioVolDown: ',',
+        radioVolUp: '.',
+        mapExpand: 'e',
+        toggleChat: 't',
+        openDiscord: '~',
+        bandwagon: '?'
     };
 
     const keybindNames = {
@@ -155,6 +184,10 @@
         right: 'Rightmost Option',
         pathfinder: 'Pathfinder Option',
         seek: 'Seek',
+        forwardAISV: 'Forwardmost Option (AISV)',
+        leftAISV: 'Leftmost Option (AISV)',
+        rightAISV: 'Rightmost Option (AISV)',
+        seekAISV: 'Seek (AISV)',
         honk: 'Honk',
         radioPower: 'Power On/Off Radio',
         radioVolDown: 'Radio Volume Down',
@@ -179,7 +212,6 @@
             settings[option] = await GM.getValue(option,defaultKeybinds[option]);
         }
     }
-    document.addEventListener('keydown', handler);
 
     const originalUpdateData = containerVDOM.methods.updateData;
     containerVDOM.state.updateData = new Proxy(originalUpdateData, {
@@ -190,21 +222,42 @@
         }
     })
 
-    /** 
-     * 
-     * @param {KeyboardEvent} e 
-     */
-
-    function handler(e) {
+    document.addEventListener('keydown', (e) => {
         if (e.target !== document.body) {
             return;
         }
-        let formattedKeyEvent = formatKeyEvent(e);
-        switch (formattedKeyEvent) {
+
+        handler(e);
+    });
+
+    waitForAisvApi.then((aisvApi) => {
+        aisvApi.messenger.addEventListener('keyDown', (event) => {
+            handler(event.args,true);
+        });
+    });
+
+    /** 
+     * 
+     * @param {String} key 
+     * @param {boolean} aisv
+     */
+
+    function handler({key},aisv=false) {
+        if(!aisv) {
+            switch (key) {
+                case settings.seek:
+                    radioVDOM.methods.seek();
+                    return;
+                default:
+                    break;
+            }
+        }
+
+        switch (key) {
             case settings.radioPower:
                 radioVDOM.methods.togglePower();
                 break;
-            case settings.seek:
+            case settings.seekAISV:
                 radioVDOM.methods.seek();
                 break;
             case settings.honk:
@@ -229,7 +282,11 @@
                 chatVDOM.methods.openDiscord();
                 break;
             default:
-                chooseOption(e);
+                if (aisv) {
+                    chooseOption(key,true);
+                } else {
+                    chooseOption(key);
+                }
         }
     }
 
@@ -241,11 +298,10 @@
 
     /**
      * 
-     * @param {KeyboardEvent} e 
+     * @param {String} key 
      * @returns 
      */
-    function chooseOption(e) {
-        const formattedKey = formatKeyEvent(e)
+    function chooseOption(key, aisv=false) {
         const optionSelect = [
             'option0',
             'option1',
@@ -271,7 +327,7 @@
 
         for (let i = 0; i < optionSelect.length; i++) {
             const element = optionSelect[i];    
-            if (settings[element] === formattedKey) {
+            if (settings[element] === key) {
                 let option = optionSelection.getNthElement(i);
                 if (option) {
                     option.click();
@@ -279,24 +335,49 @@
                 }
             }
         }
-
-        switch (formattedKey) {
-            case settings.left:
-                if (optionSelection.firstOption) {
-                    optionSelection.firstOption.click();
-                }
-                break;
-            case settings.right:
-                if (optionSelection.lastOption) {
-                    optionSelection.lastOption.click();
-                }
-                break;
-            case settings.forward: {
-                let middle = optionSelection.middleOption;
-                if (middle) {
-                    middle.click();
-                }
+        function pickFirst() {
+            if (optionSelection.firstOption) {
+                optionSelection.firstOption.click();
             }
+        }
+
+        function pickLast() {
+            if (optionSelection.lastOption) {
+                optionSelection.lastOption.click();
+            }
+        }
+
+        function pickForward() {
+            let middle = optionSelection.middleOption;
+            if (middle) {
+                middle.click();
+            }
+        }
+
+        if(!aisv) {
+            switch (key) {
+                case settings.left:
+                    pickFirst();
+                    return;
+                case settings.right:
+                    pickLast();
+                    return;
+                case settings.forward:
+                    pickForward();
+                    return;
+                default:
+                    break;
+            }
+        }
+        switch (key) {
+            case settings.leftAISV:
+                pickFirst();
+                break;
+            case settings.rightAISV:
+                pickLast();
+                break;
+            case settings.forwardAISV:
+                pickForward();
                 break;
             case settings.pathfinder: {
                 let pathfinder = optionsBody.querySelector('.pathfinder-chosen-option');
@@ -455,8 +536,8 @@
             checkForConflicts();
             return;
         }
-        const formattedEvent = formatKeyEvent(e);
-        settings[key] = formattedEvent;
+
+        settings[key] = e.key;
         await GM.setValue(key,settings[key])
         keybindInput.value = settings[key];
         checkForConflicts();
@@ -468,9 +549,9 @@
      * @param {string} key 
      */
     async function resetKeybind(keybindInput,key) {
+        await GM.deleteValue(key);
         const ogSetting = defaultKeybinds[key];
         settings[key] = ogSetting;
-        await GM.setValue(key,ogSetting);
         keybindInput.value = ogSetting;
         checkForConflicts();
     }
@@ -482,21 +563,6 @@
                 await resetKeybind(keybindInput,key)
             }
         }
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} e 
-     */
-    function formatKeyEvent(e) {
-        let shift = e.shiftKey ? 'Shift' : '';
-        let meta = e.metaKey ? 'Meta' : '';
-        let ctrl = e.ctrlKey ? 'Ctrl' : '';
-        let alt = e.altKey ? 'Alt' : '';
-        
-        let arr = [ctrl,alt,shift,meta,(['Control','Shift','Alt','Meta'].some(sub => e.code.startsWith(sub)) ? '' : e.code)];
-        
-        return arr.filter((word) => word.length > 0).join(' + ');
     }
 
     function checkForConflicts() {
