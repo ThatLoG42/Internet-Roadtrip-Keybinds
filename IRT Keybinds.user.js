@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.5
+// @version     1.5.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -41,6 +41,7 @@
         -webkit-text-stroke: 0.2px white;
         position: relative;
         text-align: center;
+        font-family: "Roboto", sans-serif;
     }
     `
     optionsBody.appendChild(optionsStyle);
