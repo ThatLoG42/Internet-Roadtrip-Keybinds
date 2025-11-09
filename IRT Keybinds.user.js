@@ -76,14 +76,18 @@
          * @param {HTMLCollectionOf<Element>} options 
          */
         constructor(options) {
+            // sort options
             this.options = _.sortBy(options,function (option) {return getRotation(option);});
             for (let i = 0; i < this.options.length; i++) {
                 let item = this.options[i];
+                // am lazy
                 let optionKey = i+1;
 
+                // does the NUMBERS
                 if (item.querySelector('.option-number')) {
                     item.querySelector('.option-number').textContent = optionKey;
                 } else {
+                    // makes the NUMBERS
                     let optionNumber = document.createElement('h1');
                     optionNumber.classList.add('option-number');
                     optionNumber.textContent = optionKey;
@@ -91,6 +95,8 @@
                 }
             }
         }
+
+        //lazy
         get firstOption() {
             if (this.options[0]) {
                 return this.options[0];
