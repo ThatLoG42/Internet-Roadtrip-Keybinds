@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.5.1
+// @version     1.6
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -75,23 +75,29 @@
          * 
          * @param {HTMLCollectionOf<Element>} options 
          */
-        constructor(options) {
+        constructor(options, showNumbers) {
             // sort options
             this.options = _.sortBy(options,function (option) {return getRotation(option);});
             for (let i = 0; i < this.options.length; i++) {
                 let item = this.options[i];
                 // am lazy
                 let optionKey = i+1;
-
-                // does the NUMBERS
-                if (item.querySelector('.option-number')) {
-                    item.querySelector('.option-number').textContent = optionKey;
+                
+                if (!showNumbers) {
+                    if (item.querySelector('.option-number')) {
+                        item.querySelector('.option-number').remove();
+                    }
                 } else {
-                    // makes the NUMBERS
-                    let optionNumber = document.createElement('h1');
-                    optionNumber.classList.add('option-number');
-                    optionNumber.textContent = optionKey;
-                    item.insertBefore(optionNumber,item.firstChild);
+                    // does the NUMBERS
+                    if (item.querySelector('.option-number')) {
+                        item.querySelector('.option-number').textContent = optionKey;
+                    } else {
+                        // makes the NUMBERS
+                        let optionNumber = document.createElement('h1');
+                        optionNumber.classList.add('option-number');
+                        optionNumber.textContent = optionKey;
+                        item.insertBefore(optionNumber,item.firstChild);
+                    }
                 }
             }
         }
@@ -212,7 +218,7 @@
      * @type {Object.<string,string>} settings
      */
     let settings = {}
-    let optionSelection = new OptionChoices(optionsBody.getElementsByClassName('option'));
+    let optionSelection = await getNewOptionChoices();
 
     for (const option in defaultKeybinds) {
         if (Object.hasOwnProperty.call(defaultKeybinds, option)) {
@@ -222,9 +228,8 @@
 
     const originalUpdateData = containerVDOM.methods.updateData;
     containerVDOM.state.updateData = new Proxy(originalUpdateData, {
-        apply: (target,thisArgs,args) => {
-            let options = optionsBody.getElementsByClassName('option');
-            optionSelection = new OptionChoices(options);
+        apply: async (target,thisArgs,args) => {
+            optionSelection = await getNewOptionChoices();
             return Reflect.apply(target, thisArgs, args);
         }
     })
@@ -242,6 +247,11 @@
             handler(event.args,true);
         });
     });
+
+    async function getNewOptionChoices() {
+        let options = optionsBody.getElementsByClassName('option');
+        return new OptionChoices(options, await GM.getValue('showNumbers',true));
+    }
 
     /** 
      * 
@@ -481,13 +491,21 @@
         }
     }
     `
+
+    const numberShower = async function(){
+        optionSelection = await getNewOptionChoices();
+    }
+
     tab.container.appendChild(tabStyle);
+    await create_checkbox('Show numbers', 'showNumbers', numberShower);
+    tab.container.appendChild(document.createElement('hr'));
     let instructionsRow = document.createElement('div');
     instructionsRow.classList.add('row');
     let instructionsLabel = document.createElement('ul');
     instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li><li>Type Escape on a keybind button to unbind keybinds</li><li>Conflicts are marked in red text</li><li>The text on the button after you type in the keybind may be different from what you typed. This is due to keyboard differences. The keybind should still be what you typed.</li>';
     instructionsRow.appendChild(instructionsLabel);
     tab.container.appendChild(instructionsRow);
+    
     tab.container.appendChild(document.createElement('hr'));
     for (const key in keybindNames) {
         if (Object.hasOwnProperty.call(keybindNames, key)) {
@@ -528,6 +546,30 @@
 
     resetRow.appendChild(resetAllButton);
     tab.container.appendChild(resetRow);
+
+    async function create_checkbox(label, gmKey, action) {
+        let checkboxRow = document.createElement('div');
+        checkboxRow.classList.add('row');
+    
+        let labelName = document.createElement('label');
+        labelName.textContent = label;
+
+        let checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = await GM.getValue(gmKey,true);
+        checkbox.className = IRF.ui.panel.styles.toggle;
+    
+        checkbox.addEventListener('change', async (e) => {
+            let checked = e.target.checked;
+            await GM.setValue(gmKey, checked);
+            await action();
+        });
+
+        
+        tab.container.appendChild(checkboxRow);
+        checkboxRow.appendChild(labelName);
+        checkboxRow.appendChild(checkbox);
+    }
 
     /**
      * 
