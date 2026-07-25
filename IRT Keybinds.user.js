@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Internet Roadtrip Keybinds
 // @namespace   http://tampermonkey.net/
-// @version     1.6
+// @version     1.6.1
 // @description Adds keybinds to Internet Roadtrip
 // @author      LoG42
 // @license     MIT
@@ -22,7 +22,7 @@
 // import IRF from 'internet-roadtrip-framework';
 // import _ from 'lodash';
 
-(async () => { 
+(async () => {
     if (!IRF.isInternetRoadtrip) return;
 
     const optionsBody = await IRF.dom.options;
@@ -41,7 +41,7 @@
         -webkit-text-stroke: 0.2px white;
         position: relative;
         text-align: center;
-        font-family: "Roboto", sans-serif;
+        font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Roboto", sans-serif;
     }
     `
     optionsBody.appendChild(optionsStyle);
@@ -72,8 +72,9 @@
 
     class OptionChoices {
         /**
-         * 
-         * @param {HTMLCollectionOf<Element>} options 
+         *
+         * @param {HTMLCollectionOf<Element>} options
+         * @param {boolean} showNumbers
          */
         constructor(options, showNumbers) {
             // sort options
@@ -82,7 +83,7 @@
                 let item = this.options[i];
                 // am lazy
                 let optionKey = i+1;
-                
+
                 if (!showNumbers) {
                     if (item.querySelector('.option-number')) {
                         item.querySelector('.option-number').remove();
@@ -125,8 +126,8 @@
             return null;
         }
         /**
-         * 
-         * @param {Number} n 
+         *
+         * @param {Number} n
          */
         getNthElement(n) {
             if (!Number.isInteger(n)) {
@@ -144,7 +145,7 @@
             return null;
         }
     }
-    
+
     const defaultKeybinds = {
         option0: '1',
         option1: '2',
@@ -226,13 +227,31 @@
         }
     }
 
-    const originalUpdateData = containerVDOM.methods.updateData;
-    containerVDOM.state.updateData = new Proxy(originalUpdateData, {
-        apply: async (target,thisArgs,args) => {
-            optionSelection = await getNewOptionChoices();
-            return Reflect.apply(target, thisArgs, args);
-        }
-    })
+    // pano change code runner thingy from lazo's void detection (thanks :) )
+    // i left the comments too they're helpful
+
+    const { set: currentPanoSetter } = Object.getOwnPropertyDescriptor(containerVDOM.state, 'currentOptions');
+    Object.defineProperty(containerVDOM.state, 'currentOptions', {
+        set(currentOptions) {
+            let value = currentPanoSetter.call(this, currentOptions);
+            // Wait for Vue to finish re-rendering the DOM on the next frame
+            setTimeout(async () => {
+                optionSelection = await getNewOptionChoices();
+                console.log("[Keybinds] Arrow keybinds updated")
+            }, 50); // 50ms buffer ensures Vue DOM patch is complete
+            return value;
+        },
+        configurable: true,
+        enumerable: true,
+    });
+
+    // const originalUpdateData = containerVDOM.methods.updateData;
+    // containerVDOM.state.updateData = new Proxy(originalUpdateData, {
+    //     apply: async (target,thisArgs,args) => {
+    //         optionSelection = await getNewOptionChoices();
+    //         return Reflect.apply(target, thisArgs, args);
+    //     }
+    // })
 
     document.addEventListener('keydown', (e) => {
         if (e.target !== document.body) {
@@ -253,9 +272,9 @@
         return new OptionChoices(options, await GM.getValue('showNumbers',true));
     }
 
-    /** 
-     * 
-     * @param {String} key 
+    /**
+     *
+     * @param {String} key
      * @param {boolean} aisv
      */
 
@@ -314,9 +333,10 @@
     }
 
     /**
-     * 
-     * @param {String} key 
-     * @returns 
+     *
+     * @param {String} key
+     * @param {boolean} aisv
+     * @returns
      */
     function chooseOption(key, aisv=false) {
         const optionSelect = [
@@ -343,7 +363,7 @@
         // }
 
         for (let i = 0; i < optionSelect.length; i++) {
-            const element = optionSelect[i];    
+            const element = optionSelect[i];
             if (settings[element] === key) {
                 let option = optionSelection.getNthElement(i);
                 if (option) {
@@ -415,7 +435,8 @@
                     optionChosen.click();
                     break;
                 } else {
-                    alert('Option doesn\'t exist!')
+                    alert('Option doesn\'t exist!');
+                    break;
                 }
             }
             default:
@@ -441,6 +462,7 @@
                     break;
                 case -1:
                     radioVDOM.methods.seek();
+                    break;
                 default:
                     optionsVDOM.methods.vote(popOption);
                     break;
@@ -463,7 +485,7 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 0.5rem;
-    
+
         input[type=text], button {
             padding: 0.35rem 1rem;
             cursor: pointer;
@@ -476,16 +498,16 @@
             transition: 0.2s;
             white-space: nowrap;
         }
-    
+
         input[type=text]:hover, button:hover {
             background: rgba(68, 68, 170, 0.1);
         }
-    
+
         input[type=text]:focus, button:active {
             border: 1px solid rgb(68, 68, 170);
             background: rgb(68, 68, 170);
         }
-    
+
         input[type=text].conflict {
             color:red;
         }
@@ -505,16 +527,16 @@
     instructionsLabel.innerHTML = '<li>Set keybinds by clicking on their button and then typing the keybind</li><li>Reset keybinds by double clicking on their button</li><li>Reset All button at the bottom</li><li>Type Escape on a keybind button to unbind keybinds</li><li>Conflicts are marked in red text</li><li>The text on the button after you type in the keybind may be different from what you typed. This is due to keyboard differences. The keybind should still be what you typed.</li>';
     instructionsRow.appendChild(instructionsLabel);
     tab.container.appendChild(instructionsRow);
-    
+
     tab.container.appendChild(document.createElement('hr'));
     for (const key in keybindNames) {
         if (Object.hasOwnProperty.call(keybindNames, key)) {
             let keybindRow = document.createElement('div');
             keybindRow.classList.add('row');
-        
+
             let labelName = document.createElement('label');
             labelName.textContent = keybindNames[key];
-        
+
             let keybindInput = document.createElement('input')
             keybindInput.type = 'text';
             keybindInput.readOnly = true;
@@ -526,7 +548,7 @@
             keybindInput.addEventListener('dblclick', async function(){
                 await resetKeybind(keybindInput,key);
             });
-            
+
             tab.container.appendChild(keybindRow);
             keybindRow.appendChild(labelName);
             keybindRow.appendChild(keybindInput);
@@ -550,7 +572,7 @@
     async function create_checkbox(label, gmKey, action) {
         let checkboxRow = document.createElement('div');
         checkboxRow.classList.add('row');
-    
+
         let labelName = document.createElement('label');
         labelName.textContent = label;
 
@@ -558,24 +580,24 @@
         checkbox.type = 'checkbox';
         checkbox.checked = await GM.getValue(gmKey,true);
         checkbox.className = IRF.ui.panel.styles.toggle;
-    
+
         checkbox.addEventListener('change', async (e) => {
             let checked = e.target.checked;
             await GM.setValue(gmKey, checked);
             await action();
         });
 
-        
+
         tab.container.appendChild(checkboxRow);
         checkboxRow.appendChild(labelName);
         checkboxRow.appendChild(checkbox);
     }
 
     /**
-     * 
-     * @param {HTMLInputElement} keybindInput 
-     * @param {string} key 
-     * @param {KeyboardEvent} e 
+     *
+     * @param {HTMLInputElement} keybindInput
+     * @param {string} key
+     * @param {KeyboardEvent} e
      */
     async function updateKeybind(keybindInput,key,e) {
         if (e.code === 'Escape') {
@@ -593,9 +615,9 @@
     }
 
     /**
-     * 
-     * @param {HTMLInputElement} keybindInput 
-     * @param {string} key 
+     *
+     * @param {HTMLInputElement} keybindInput
+     * @param {string} key
      */
     async function resetKeybind(keybindInput,key) {
         await GM.deleteValue(key);
